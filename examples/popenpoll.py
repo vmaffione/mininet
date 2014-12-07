@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 "Monitor multiple hosts using popen()/pmonitor()"
 

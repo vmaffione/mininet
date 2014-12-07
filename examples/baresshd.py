@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 "This example doesn't use OpenFlow, but attempts to run sshd in a namespace."
 

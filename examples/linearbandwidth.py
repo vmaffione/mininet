@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 """
 Test bandwidth (using iperf) on linear networks of varying size,

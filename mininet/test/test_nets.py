@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 """Package: mininet
    Test creation and all-pairs ping for each included mininet topo type."""

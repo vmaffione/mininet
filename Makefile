@@ -7,8 +7,8 @@ PYSRC = $(MININET) $(TEST) $(EXAMPLES) $(BIN)
 MNEXEC = mnexec
 MANPAGES = mn.1 mnexec.1
 P8IGN = E251,E201,E302,E202
-BINDIR = /usr/bin
-MANDIR = /usr/share/man/man1
+BINDIR = $(DESTDIR)/usr/bin
+MANDIR = $(DESTDIR)/usr/share/man/man1
 DOCDIRS = doc/html doc/latex
 PDF = doc/latex/refman.pdf
 
@@ -40,15 +40,15 @@ mnexec: mnexec.c $(MN) mininet/net.py
 	cc $(CFLAGS) $(LDFLAGS) -DVERSION=\"`PYTHONPATH=. $(MN) --version`\" $< -o $@
 
 install: $(MNEXEC) $(MANPAGES)
-	install $(MNEXEC) $(BINDIR)
-	install $(MANPAGES) $(MANDIR)
-	python setup.py install
+	mkdir -p $(BINDIR); install $(MNEXEC) $(BINDIR)
+	mkdir -p $(MANDIR);install $(MANPAGES) $(MANDIR)
+	python2 setup.py install --prefix=/usr --root="$(DESTDIR)" --optimize=1 install
 
 develop: $(MNEXEC) $(MANPAGES)
 	# Perhaps we should link these as well
-	install $(MNEXEC) $(BINDIR)
-	install $(MANPAGES) $(MANDIR)
-	python setup.py develop
+	mkdir -p $(BINDIR); install $(MNEXEC) $(BINDIR)
+	mkdir -p $(MANDIR);install $(MANPAGES) $(MANDIR)
+	python2 setup.py install --prefix=/usr --root="$(DESTDIR)" --optimize=1 develop
 
 man: $(MANPAGES)
 
