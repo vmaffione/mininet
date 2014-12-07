@@ -11,20 +11,22 @@ class LinuxBridge( Switch ):
         Switch.__init__( self, name, **kwargs )
 
     def start( self, controllers ):
-        self.cmd( 'ifconfig', self, 'down' )
+        self.cmd( 'ip link set', self, 'down' )
         self.cmd( 'brctl delbr', self )
         self.cmd( 'brctl addbr', self )
         if self.stp:
             self.cmd( 'brctl setbridgeprio', self.prio )
-            self.cmd( 'brctl stp', self, 'on' )
+            # The following causes connectivity problems
+            # for a few seconds after boot
+            #self.cmd( 'brctl stp', self, 'on' )
             LinuxBridge.prio += 1
         for i in self.intfList():
             if self.name in i.name:
                 self.cmd( 'brctl addif', self, i )
-        self.cmd( 'ifconfig', self, 'up' )
+        self.cmd( 'ip link set ', self, 'up' )
 
     def stop( self ):
-        self.cmd( 'ifconfig', self, 'down' )
+        self.cmd( 'ip link set', self, 'down' )
         self.cmd( 'brctl delbr', self )
 
 
