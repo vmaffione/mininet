@@ -27,7 +27,27 @@ class LinuxBridge( Switch ):
         self.cmd( 'ifconfig', self, 'down' )
         self.cmd( 'brctl delbr', self )
 
+
 class ABCTopo( Topo ):
+    "Simple topology example."
+
+    def __init__( self ):
+        "Create custom topo."
+
+        # Initialize topology
+        Topo.__init__( self )
+
+        # Add hosts and switches
+        leftHost = self.addHost( 'h1' )
+        middleHost = self.addHost( 'h2' )
+        rightHost = self.addHost( 'h3' )
+
+        # Add links
+        self.addLink( leftHost, middleHost )
+        self.addLink( middleHost, rightHost )
+
+
+class ABCTopoSwitched( Topo ):
     "Simple topology example."
 
     def __init__( self ):
@@ -49,6 +69,6 @@ class ABCTopo( Topo ):
         self.addLink( middleHost, rightSwitch )
         self.addLink( rightSwitch, rightHost )
 
-
-topos = { 'abctopo': ( lambda: ABCTopo() ) }
+topos = { 'abctopo': ( lambda: ABCTopo() ),
+          'abctopo-switched': ( lambda: ABCTopoSwitched() ) }
 switches = { 'lxbr': LinuxBridge }
