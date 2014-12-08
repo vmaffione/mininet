@@ -1,0 +1,31 @@
+How to use mininet, with possiby custom topologies, switches,
+controllers and so on.
+
+(A) Using the /bin/mn launcher with built-in topologies. This will
+    automatically setup the topology, creating hosts (nodes, switches,
+    controllers) and links and start the CLI.
+
+    $ sudo mn --topo single,3 --switch ovsk
+
+(B) Using the /bin/mn launcher with default topolocies, switches, etc.
+    The implementation of the "lxbr" switch and the abctopo-switched
+    topology is specified in the user-provided lxbr.py extension
+    script. As in the (A) case, however, mininet will still automatically
+    setup the topolocy, creating hosts and links and start the CLI.
+
+    $ sudo mn --custom $PWD/lxbr.py --topo abctopo-switched --switch lxbr
+
+(C) Using a default launcher python script, which uses the middle-level
+    API + Topo class. The Topo class is used to define the topology, which
+    will setup by the Mininet constructor. The mininet must be started
+    manually (net.start() and net.stop()). Mininet CLI may be started
+    if required.
+
+    $ sudo ./script1.py
+
+(D) Using a default launcher python script, which uses the middle-level
+    API to create hosts and links. The mininet must be started
+    manually (net.start() and net.stop()). Mininet CLI may be started
+    if required.
+
+    $ sudo ./script2.py
