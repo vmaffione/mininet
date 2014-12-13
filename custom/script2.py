@@ -29,6 +29,7 @@ def enableIpForwarding(host, enable = True):
 
 def main():
     A1_NAT = False
+    A2_NAT = False
 
     net = Mininet()
     # Create hosts and switches. For hosts, we specify ip = None, so that
@@ -95,7 +96,8 @@ def main():
     # Set global routes in default-free zone (ISP network)
     if not A1_NAT:
         setHostRoute(h91, '10.0.1.0/24', '192.168.81.1', 'h91-eth0')
-    setHostRoute(h91, '10.0.2.0/24',     '192.168.70.92', 'h91-eth1')
+    if not A2_NAT:
+        setHostRoute(h91, '10.0.2.0/24', '192.168.70.92', 'h91-eth1')
     setHostRoute(h91, '192.168.82.0/24', '192.168.70.92', 'h91-eth1')
     setHostRoute(h91, '10.0.3.0/24',     '192.168.70.93', 'h91-eth1')
     setHostRoute(h91, '192.168.83.0/24', '192.168.70.93', 'h91-eth1')
@@ -103,14 +105,16 @@ def main():
     if not A1_NAT:
         setHostRoute(h92, '10.0.1.0/24', '192.168.70.91', 'h92-eth1')
     setHostRoute(h92, '192.168.81.0/24', '192.168.70.91', 'h92-eth1')
-    setHostRoute(h92, '10.0.2.0/24',     '192.168.82.11', 'h92-eth0')
+    if not A2_NAT:
+        setHostRoute(h92, '10.0.2.0/24', '192.168.82.11', 'h92-eth0')
     setHostRoute(h92, '10.0.3.0/24',     '192.168.70.93', 'h92-eth1')
     setHostRoute(h92, '192.168.83.0/24', '192.168.70.93', 'h92-eth1')
 
     if not A1_NAT:
         setHostRoute(h93, '10.0.1.0/24', '192.168.70.91', 'h93-eth1')
     setHostRoute(h93, '192.168.81.0/24', '192.168.70.91', 'h93-eth1')
-    setHostRoute(h93, '10.0.2.0/24',     '192.168.70.92', 'h93-eth1')
+    if not A2_NAT:
+        setHostRoute(h93, '10.0.2.0/24', '192.168.70.92', 'h93-eth1')
     setHostRoute(h93, '192.168.82.0/24', '192.168.70.92', 'h93-eth1')
     setHostRoute(h93, '10.0.3.0/24',     '192.168.83.21', 'h93-eth0')
 
@@ -127,6 +131,10 @@ def main():
         h1.cmd('iptables -t nat -A POSTROUTING '
                '--out-interface h1-eth1 -j MASQUERADE')
 
+    if A2_NAT:
+        # NAT A2 network at A1 CE router
+        h11.cmd('iptables -t nat -A POSTROUTING '
+               '--out-interface h11-eth1 -j MASQUERADE')
     net.start()
     print "Dumping host connections"
     dumpNodeConnections(net.hosts)
