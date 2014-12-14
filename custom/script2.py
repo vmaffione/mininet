@@ -30,6 +30,7 @@ def enableIpForwarding(host, enable = True):
 def main():
     A1_NAT = False
     A2_NAT = False
+    A1_A2_P2P_VPN = False
 
     net = Mininet()
     # Create hosts and switches. For hosts, we specify ip = None, so that
@@ -135,6 +136,20 @@ def main():
         # NAT A2 network at A1 CE router
         h11.cmd('iptables -t nat -A POSTROUTING '
                '--out-interface h11-eth1 -j MASQUERADE')
+
+    if A1_NAT and A2_NAT and A1_A2_P2P_VPN:
+        # A1 and A2 are behind NAT, so they cannot communicate
+        # with each other. However, since h1 (A1 CE) and h11 (A2 CE)
+        # have public IPs (192.168.81.1 and 192.168.82.11, respectively,
+        # we can create an OpenVPN p2p tunnel - represented by the virtual
+        # point-to-point subnet 10.4.0.1-10.4.0.2, and route the private
+        # subnets through the VPN tunnel (i.e. through tun1).
+        h1.cmd('openvpn  --remote 192.168.82.11 --dev tun1 '
+                        '--ifconfig 10.4.0.1 10.4.0.2 '
+                        '--route 10.0.2.0 255.255.255.0 vpn_gateway &')
+        h11.cmd('openvpn --remote 192.168.81.1 --dev tun1 '
+                        '--ifconfig 10.4.0.2 10.4.0.1 '
+                        '--route 10.0.1.0 255.255.255.0 vpn_gateway &')
     net.start()
     print "Dumping host connections"
     dumpNodeConnections(net.hosts)
