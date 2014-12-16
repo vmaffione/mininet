@@ -176,6 +176,12 @@ def main():
                         '--cert /root/easy-rsa/keys/h22.crt '
                         '--key /root/easy-rsa/keys/h22.key '
                         '--pull &')
+        h23.cmd('openvpn --remote 192.168.82.11 --dev tun2 '
+                        '--port 5000 --tls-client '
+                        '--ca /root/easy-rsa/keys/ca.crt '
+                        '--cert /root/easy-rsa/keys/h23.crt '
+                        '--key /root/easy-rsa/keys/h23.key '
+                        '--pull &')
 
     net.start()
     print "Dumping host connections"
