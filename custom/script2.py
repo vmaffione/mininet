@@ -28,9 +28,14 @@ def enableIpForwarding(host, enable = True):
     output = host.cmd('sysctl net.ipv4.ip_forward=%s' % (value))
 
 def main():
-    A1_NAT = False
-    A2_NAT = False
-    A1_A2_P2P_VPN = False
+    A1_NAT = True
+    A2_NAT = True
+    A1_A2_P2P_VPN = True
+    A2_ACCESS_VPN = False
+
+    # Validation of boolean options
+    A1_A2_P2P_VPN = A1_A2_P2P_VPN and A1_NAT and A2_NAT
+    A2_ACCESS_VPN = A2_ACCESS_VPN and A2_NAT
 
     net = Mininet()
     # Create hosts and switches. For hosts, we specify ip = None, so that
@@ -137,7 +142,7 @@ def main():
         h11.cmd('iptables -t nat -A POSTROUTING '
                '--out-interface h11-eth1 -j MASQUERADE')
 
-    if A1_NAT and A2_NAT and A1_A2_P2P_VPN:
+    if A1_A2_P2P_VPN:
         # A1 and A2 are behind NAT, so they cannot communicate
         # with each other. However, since h1 (A1 CE) and h11 (A2 CE)
         # have public IPs (192.168.81.1 and 192.168.82.11, respectively,
@@ -150,12 +155,35 @@ def main():
         h11.cmd('openvpn --remote 192.168.81.1 --dev tun1 '
                         '--ifconfig 10.4.0.2 10.4.0.1 '
                         '--route 10.0.1.0 255.255.255.0 vpn_gateway &')
+
+    if A2_ACCESS_VPN:
+        h11.cmd('openvpn --mode server --dev tun2 '
+                        '--port 5000 --tls-server '
+                        '--dh /root/easy-rsa/keys/dh2048.pem '
+                        '--ca /root/easy-rsa/keys/ca.crt '
+                        '--cert /root/easy-rsa/keys/h11.crt '
+                        '--key /root/easy-rsa/keys/h11.key '
+                        '--topology p2p '
+                        '--push "topology p2p" '
+                        '--ifconfig 10.8.0.1 10.8.0.2 '
+                        '--ifconfig-pool 10.8.0.4 10.8.0.251 '
+                        '--route 10.8.0.0 255.255.255.0 vpn_gateway '
+                        '--client-to-client '
+                        '--push "route 10.8.0.0 255.255.255.0" &')
+        h22.cmd('openvpn --remote 192.168.82.11 --dev tun2 '
+                        '--port 5000 --tls-client '
+                        '--ca /root/easy-rsa/keys/ca.crt '
+                        '--cert /root/easy-rsa/keys/h22.crt '
+                        '--key /root/easy-rsa/keys/h22.key '
+                        '--pull &')
+
     net.start()
     print "Dumping host connections"
     dumpNodeConnections(net.hosts)
     print "Executing commands"
     #print net.get('h1').cmd('ip route')
     CLI(net)
+    s1.cmd('killall openvpn')
     net.stop()
 
 if __name__ == '__main__':
