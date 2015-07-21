@@ -1,3 +1,6 @@
+For Archlinux, install mininet from AUR (the stable version,
+not the mininet-git version).
+
 How to use mininet, with possiby custom topologies, switches,
 controllers and so on.
 
